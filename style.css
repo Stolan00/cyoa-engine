@@ -1,0 +1,217 @@
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+    margin: 0;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    width: 100vw;
+    min-height: 100vh;
+    background-color:#0f0f0f;;/*#0f1111;*/
+    font-family: Arial, sans-serif;
+    overflow-x: hidden; 
+    overflow-y: auto; 
+    padding-top: 50px; 
+    padding-bottom: 50px; 
+    }
+
+    .input-flex-container {
+        display: flex;
+        width: 100%; /* Take the full width of its parent */
+        align-items: center; /* Center the items vertically */
+        gap: 10px; /* Space between textarea and button */
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 600px;
+        max-width: 80%;
+        background-color: #444; 
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.5); 
+        text-align: center;
+        margin-top: 40px;
+    }
+
+
+    #text {
+        font-size: 20px;
+        margin: 0 200px; 
+        margin-bottom: 20px;
+        margin-top: 20px;
+        color: white;
+    }
+
+    #textInput {
+        min-height: 40px;
+        height: 40px;
+        background-color: #555;
+        border: 1px solid #555;
+        flex-grow: 1; /* Let the textarea grow to fill the space */
+        margin-right: 50px; /* Optional: Adjust this value to create space between the textarea and the button */
+        padding: 10px;
+        width: 70%; /* Make the textarea fill its container */
+
+        box-sizing: border-box; /*Include padding and border in the element's total width and height */
+        resize: none; /* Disable the default resizable handle */
+        overflow-y: hidden; /* Hide the scrollbar */
+    }
+    
+    #text-submit {
+        flex-shrink: 0;
+    }
+    @media (max-width: 768px) {
+        #text {
+            margin: 20px 50px; 
+        }
+
+        #text-input input[type="text"] {
+            width: 70%; 
+        }
+    }
+
+    @media (max-width: 480px) {
+        #text {
+            margin: 20px 20px; 
+        }
+
+        #text-input input[type="text"] {
+            width: 70%; 
+        }
+    }
+    
+    @media (max-width: 320px) {
+        #text-input input[type="text"] {
+            width: 70%; 
+        }
+
+        #text {
+            margin: 20px 10px;
+        }
+    }
+
+    .btn-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, auto);
+        gap: 10px;
+    }
+
+    .btn {
+        background-color: #444;
+        border: 1px solid #444;
+        border-radius: 5px;
+        padding: 5px 10px;
+        color: white; 
+        outline: none;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+        font-size: 16px;
+    }
+
+    .btn:hover, .btn.hover {
+        background-color: #888; /*#999*/
+        border-color: #888; 
+    }
+
+    /* #text-input input[type="text"] {
+        max-width: 100%; 
+        width: 70%; 
+        background-color: #555;
+        border: 1px solid #555;
+        border-radius: 5px;
+        padding: 5px 10px;
+        color: white;
+        font-family: Arial, sans-serif;
+        outline: none;
+        margin-right: 10px; 
+        font-size: 16px;
+    } */
+
+    #text-input button {
+        background-color: #444; 
+        border: 1px solid #444;
+        border-radius: 5px;
+        padding: 5px 10px;
+        color: white;
+        font-family: Arial, sans-serif;
+        outline: none;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    #text-input button:hover {
+        background-color: #888; 
+        border-color: #888;
+    }
+
+    #back-button {
+    background-color: #555; 
+    border: 1px solid #555; 
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: white;
+    font-family: Arial, sans-serif;
+    outline: none;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-top: 30px; 
+   /* margin-left: 10px;  */
+    }
+
+    #back-button:hover {
+    
+    background-color: #333; /*#444*/
+    border-color: #333;
+    }
+
+    .fade-in {
+    animation: fadeIn 0.5s ease-in-out; 
+    opacity: 0;
+    animation-fill-mode: forwards;
+    }
+
+    @keyframes fadeIn {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    ::-webkit-scrollbar {
+    width: 10px; 
+    background-color: #2c2f33;
+    }
+
+    
+    ::-webkit-scrollbar-thumb {
+        background-color: #4f545c; 
+        border-radius: 5px; 
+        border: 2px solid #2c2f33; 
+    }
+
+  
+    ::-webkit-scrollbar-track {
+        background-color: #23272a; 
+        border-radius: 5px; 
+    }
+
+    scrollbar-thumb {
+    background-color: #4f545c; /*dont think this even does anything*/
+    border-radius: 5px; 
+    scrollbar-width: thin;
+    }
+
+    
+    scrollbar-track {
+        background-color: #23272a; 
+        border-radius: 5px; 
+        width: thin;
+    }

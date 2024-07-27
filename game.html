@@ -1,0 +1,42 @@
+<!---------------Boiler Plate and General Structure------------------->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="dynamicTitle">title</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="text">Text</div>
+    <div class="container">
+        <div id="choice-buttons" class="btn-grid">
+            <button class="btn">Choice 1</button>
+            <button class="btn">Choice 2</button>
+            <button class="btn">Choice 3</button>
+            <button class="btn">Choice 4</button>
+        </div>
+        <div id="text-input" style="display: none;" class="input-flex-container">
+            <textarea id="textInput" placeholder="Enter your name" rows="1" class="btn"></textarea>
+            <button class="btn" id="text-submit">Enter</button>
+        </div>
+                
+    </div>
+
+    <button class="btn" id="back-button">Back</button>
+
+<!--Include Game Engine-->
+<script src="./engine.js"></script>
+
+<!--Include Game Text-->
+<script src="./game.js"></script>
+
+<!--Start Game-->
+<script>
+
+startGame(disk);
+
+</script>
+</body>
+</html>
