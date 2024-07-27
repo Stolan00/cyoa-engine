@@ -1,49 +1,84 @@
 //-----------------------------------------------------------------------
-const textElement = document.getElementById('text')
-const choiceButtonsElement = document.getElementById('choice-buttons')
-const nameInputElement = document.getElementById('name-input');
-const nameInput = document.getElementById('name');
-const nameSubmitButton = document.getElementById('name-submit');
-const navigationHistory = [];
+const textElement          = document.querySelector('#text')
+const choiceButtonsElement = document.querySelector('#choice-buttons')
+const textInputElement     = document.querySelector('#text-input');
+const textInput            = document.querySelector('#textInput');
+const textSubmitButton     = document.querySelector('#text-submit');
+const navigationHistory    = [];
 
 let state = {};
 
 let gameDisk;
+
 let textNodes;
 
 let currentChoiceIndex = -1;
 let currentChoices = [];
+
+// Support for optional objects in game disks.
+let characters;
+let genderPronouns;
+let player;
+let inventory;
 //-----------------------------------------------------------------------
 let startGame = (diskFile) => {
     gameDisk = diskFile();
 
-    initializeGame(gameDisk);
+    setTitle();
 
-    loadText(gameDisk);
+    initializeGame();
+
+    loadText();
 
     showTextNode(gameDisk.startingNode);
 }
 //-----------------------------------------------------------------------
-function initializeGame(gameDisk) {
+function setTitle() {
+    if (gameDisk.title) document.getElementById('dynamicTitle').textContent = gameDisk.title;
+    else document.getElementById('dynamicTitle').textContent = "cyoa-engine";
+}
+//-----------------------------------------------------------------------
+function initializeGame() {
     navigationHistory.length = 0; //clear nav history on start
+    textInput.value = null; //dont know if its worth it to instantiate every time i need it or not (probably not)
+
+    //this probably needs to go in its own function along with the other listeners
+    textInput.addEventListener('input', function() {
+        const baseHeight = 40; // this should probably query the CSS for the base height rather than being explicitly set to 40
+                                //that said i could also just fucking fix it so using height 'auto' doesnt set it to 56px with a single line of text anymore (probably some other css property is causing the error)
+        this.style.height = baseHeight + 'px'; // Reset to base height before recalculating
+    
+        // Calculate the desired height based on scrollHeight, but ensure it's not less than the base height
+        const newHeight = Math.max(this.scrollHeight, baseHeight);
+        this.style.height = newHeight + 'px';
+        console.log(this.style.height);
+    });
+    
+    initializeVariables();
 
     gameDisk.initGame();
 }
 //-----------------------------------------------------------------------
-let loadText = (gameDisk) => {
+function initializeVariables() {
+    characters     = gameDisk.characters;
+    genderPronouns = gameDisk.genderPronouns;
+    player         = gameDisk.player;
+    inventory      = gameDisk.inventory;
+}
+//-----------------------------------------------------------------------
+let loadText = () => {
     if ( !gameDisk ) return;
 
     textNodes = gameDisk.textNodes();
 
     console.log('Text Loaded');
 }
-
 //-----------------------------------------------------------------------
-// keyboard navigation
+// Support for keyboard navigation when selecting choices
 function updateChoiceHighlight(index) {
     const buttons = document.querySelectorAll('.btn');
 
-    if (buttons.length === 0) return;
+    if (!buttons.length) return;
 
     // remove hover from all buttons
     buttons.forEach(button => {
@@ -51,11 +86,11 @@ function updateChoiceHighlight(index) {
     });
     
     // hover current
-    if (index >= 0 && index < buttons.length) {
+    if (index >= 0 && index < buttons.length) 
         buttons[index].classList.add('hover');
-    }
 }
 //-----------------------------------------------------------------------
+// Deselects all choices
 function resetChoiceIndex() {
     currentChoiceIndex = -1;
     updateChoiceHighlight();
@@ -64,13 +99,14 @@ function resetChoiceIndex() {
 function changeChoiceIndex(change) {
     if (!currentChoices.length) return;
 
-    const change_direction = (change > 0 ? "RIGHT" : "LEFT");
-    
-    if (currentChoiceIndex === -1) { //if no choice is active
-    currentChoiceIndex = change_direction === "RIGHT" ? -1 : 0;
-    }
+    const noChoiceActive = currentChoiceIndex === -1;
 
-    // wrap around
+    const changeDirection = (change > 0 ? "RIGHT" : "LEFT");
+    
+    if ( noChoiceActive )
+        currentChoiceIndex = changeDirection === "RIGHT" ? -1 : 0;
+
+    // Wrap around
     currentChoiceIndex = (currentChoiceIndex + change + currentChoices.length) % currentChoices.length;
 
     updateChoiceHighlight(currentChoiceIndex);
@@ -78,13 +114,14 @@ function changeChoiceIndex(change) {
 //-----------------------------------------------------------------------
 function selectCurrentChoice() {
     const buttons = document.querySelectorAll('.btn');
-    if (!buttons.length || currentChoiceIndex < 0 || currentChoiceIndex >= buttons.length) return;
+
+    if ( !buttons.length || currentChoiceIndex < 0 || currentChoiceIndex >= buttons.length ) return;
 
     buttons[currentChoiceIndex].click(); 
 }
-
 //-----------------------------------------------------------------------
-function advanceToNextNode() { //for when no choice is active but we need to go to the next page 
+// For when no choice is active but we need to go to the next page 
+function advanceToNextNode() { 
     let currentTextNode = null;        
 
     if (navigationHistory.length < 0) return;
@@ -93,58 +130,56 @@ function advanceToNextNode() { //for when no choice is active but we need to go 
 
     if (textNodeFunction) {
         currentTextNode = textNodeFunction();
-
         
         if (currentTextNode.choices != null && currentTextNode.choices.length)
-            selectChoice(currentTextNode.choices[0]); //first choice
-        else 
-        {
-            //why is this here? isnt there always a choice? why do we need the else branch?
-            showTextNode(currentTextNode.nextText);
-        }
+            selectChoice(currentTextNode.choices[0]); // Select the first choice
+                                                      // Note: if 'choices' element does not exist in textNode, engine will create a default button with the text ("Next")
     }
     else console.log("NOTHING HAPPENED");
 }
 //-----------------------------------------------------------------------
-// keyboard listener for keydown on the entire document
+// Keyboard listener for keydown on the entire document
 document.addEventListener('keydown', function(event) {
-    const textInputActive = document.activeElement === nameInput; // check for textbox selected
+    const textInputActive = document.activeElement === textInput; // check for textbox selected
 
     if (textInputActive) return;
+
+    const noChoiceActive = currentChoiceIndex === -1;
+    const left = -1, right = 1;
 
     switch (event.key) {
         case 'Enter': //next page or select choice
         case ' ':
-            if (currentChoiceIndex === -1) {
+            if ( noChoiceActive ) {
                 event.preventDefault();
                 advanceToNextNode();
-            } else {
-                selectCurrentChoice();
-            }
+            } 
+            else selectCurrentChoice();
+
             break;
 
-        case 'ArrowLeft': //move choice index left
+        case 'ArrowLeft': 
         case 'a':
         case 'A':
-            changeChoiceIndex(1); // left
+            changeChoiceIndex(right);
             break;
 
-        case 'ArrowRight': //move choice index right
+        case 'ArrowRight':
         case 'd':
         case 'D':
-            changeChoiceIndex(-1); // right
+            changeChoiceIndex(left);
             break;
 
         // will maybe add up and down in the grid at some point
 
-        case 'Backspace': //previous page
+        case 'Backspace': // Previous page
             event.preventDefault();
             goBack();
             break;
 
-        case 'Escape': //erase annoying highlight
+        case 'Escape': // Erase highlight
             resetChoiceIndex();
-
+            
         default: break;
     }
 
@@ -172,9 +207,7 @@ function applyFadeInAnimation(element) {
     element.classList.add('fade-in');
 }
 //-----------------------------------------------------------------------
-let showTextNode = (textNodeIndex) => { //using let for easy overriding by user
-//function showTextNode(textNodeIndex) {
-
+let showTextNode = (textNodeIndex) => { // Using let for easy overriding by user
     if(textNodeIndex === "restart") return startGame();
 
     let textNodeFunction = textNodes.get(textNodeIndex);
@@ -202,7 +235,7 @@ let showTextNode = (textNodeIndex) => { //using let for easy overriding by user
     renderText(formattedText);
 
     if (textNode.input) {
-        handleTextInput(textNode.nextText);
+        handleTextInput(textNode);
     } 
     else {
         showChoiceButtons(textNode);
@@ -233,38 +266,44 @@ let addStyleTags = (str, char, tagName) => {
     return str;
   };
 //-----------------------------------------------------------------------
-function handleTextInput(nextText) {
+// Handles processing for text box input
+function handleTextInput(textNode) {
     choiceButtonsElement.style.display = 'none';
-    nameInputElement.style.display = 'block';
-    nameInput.focus();
+    textInputElement.style.display = 'block';
+    textInput.value = '';
+    textInput.focus();
 
-    const submitName = () => {
-        const playerName = nameInput.value;
-        state.playerName = playerName;
-        showTextNode(nextText); // next node after you click submit
+    const submitText = () => {
+        const textValue = textInput.value;
+
+        if (typeof textNode.afterEnter === 'function') textNode.afterEnter();
+
+        showTextNode(textNode.nextText); // next node after you click submit
 
         // clean up event listeners
-        nameSubmitButton.removeEventListener('click', submitName);
-        nameInput.removeEventListener('keydown', handleEnterKey);
+        textSubmitButton.removeEventListener('click', submitText);
+        textInput.removeEventListener('keydown', handleEnterKey);
+
+        return textValue;
     };
 
     const handleEnterKey = (event) => {
         if (event.key === 'Enter') {
-            submitName();
+            submitText();
         }
     };
 
     // add click listener
-    nameSubmitButton.addEventListener('click', submitName);
+    textSubmitButton.addEventListener('click', submitText);
 
     // add keydown listener
-    nameInput.addEventListener('keydown', handleEnterKey);
+    textInput.addEventListener('keydown', handleEnterKey);
 }
 //-----------------------------------------------------------------------
 function showChoiceButtons(textNode) {
     choiceButtonsElement.style.display = 'grid';
 
-    nameInputElement.style.display = 'none';
+    textInputElement.style.display = 'none';
 
     const singleChoice = textNode.choices.length === 1;
 
@@ -278,7 +317,6 @@ function showChoiceButtons(textNode) {
 
     resetChoiceIndex();
 }
-
 //-----------------------------------------------------------------------
 function clearChoiceButtons() {
     while (choiceButtonsElement.firstChild) {
@@ -315,13 +353,16 @@ function selectChoice(choice) {
     
     state = Object.assign(state, choice.setState);
 
+    if(choice.afterSelect) choice.afterSelect();
+
     removeChoiceButtonListeners(); //cleanup listeners
 
     showTextNode(nextTextNodeId);
 }
 //-----------------------------------------------------------------------
 // support for markdown-like tags in text. Curently supports underline, bold, italic, and strikethrough. Also supports replacing newline characters with <br> tags.
-// source: text-engine by okaybenji on github
+// also supports intuitive writing system for player/npc gender pronouns, see documentation
+// styletags sourced from text-engine by okaybenji on github
 function formatText(str) {
     str = addStyleTags(str, '__', 'u');
     str = addStyleTags(str, '**', 'b');
@@ -333,7 +374,56 @@ function formatText(str) {
     str = str.replace('\n', '<br>');
     }
 
+    //replace pronoun tags
+    str = replacePronouns(str);
+
     return str;
+}
+//-----------------------------------------------------------------------
+function replacePronouns(text) {
+    return text.replace(/\[([^\]]+)\]/g, (match, placeholder) => {
+        let pronounMapping, gender, pronoun;
+
+        const key = placeholder;
+
+        const isNPC = key.includes(".") && (key.match(/\./g) || []).length === 1; //an NPC's pronoun tag should contain only a single dot
+        
+        if ( isNPC ) {
+            const [name, charPronoun] = key.split(".");
+            
+            if (characters[name]) gender = characters[name].gender;
+
+            pronounMapping = genderPronouns[charPronoun.toLowerCase()]
+            pronoun = charPronoun;
+        }
+
+        else { //not an NPC, default to player gender
+            pronounMapping = genderPronouns[key.toLowerCase()];
+
+            if (player.gender) gender = player.gender;
+
+            else if (characters["player"].gender) gender = characters["player"].gender
+
+            pronoun = placeholder;
+        }
+
+        // If there's a custom pronoun mapping for this key and gender, use it; otherwise, keep the placeholder
+        if (pronounMapping && pronounMapping[gender]) { //eg if "[He]" is present in text and in the pronoun mapping, and "male" is present in the mapping list
+            let replacement = pronounMapping[gender];
+            
+            // Check if the original placeholder was uppercase and adjust the replacement accordingly
+            if (pronoun[0] === pronoun[0].toUpperCase()) {
+                // Capitalize the first letter of the replacement if the placeholder was capitalized
+                replacement = replacement.charAt(0).toUpperCase() + replacement.slice(1);
+            }
+            return replacement;
+
+        }
+        else {
+            // If no mapping found, return the original placeholder (with brackets)
+            return match;
+        }
+    });
 }
 //-----------------------------------------------------------------------
 function goBack() {
@@ -349,5 +439,4 @@ function goBack() {
     console.log("Navigation history (after goBack):", navigationHistory);
     
     showTextNode(previousTextNodeId);
-
 }
