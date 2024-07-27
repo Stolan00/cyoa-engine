@@ -45,7 +45,7 @@ function initializeGame() {
     //this probably needs to go in its own function along with the other listeners
     textInput.addEventListener('input', function() {
         const baseHeight = 40; // this should probably query the CSS for the base height rather than being explicitly set to 40
-                                //that said i could also just fucking fix it so using height 'auto' doesnt set it to 56px with a single line of text anymore (probably some other css property is causing the error)
+                                //that said i could also just fix it so using height 'auto' doesnt set it to 56px with a single line of text anymore (probably some other css property is causing the error)
         this.style.height = baseHeight + 'px'; // Reset to base height before recalculating
     
         // Calculate the desired height based on scrollHeight, but ensure it's not less than the base height
