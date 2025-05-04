@@ -364,7 +364,6 @@ function selectChoice(choice) {
 }
 //-----------------------------------------------------------------------
 // support for markdown-like tags in text. Curently supports underline, bold, italic, and strikethrough. Also supports replacing newline characters with <br> tags.
-// also supports intuitive writing system for player/npc gender pronouns, see documentation
 // styletags sourced from text-engine by okaybenji on github
 function formatText(str) {
     str = addStyleTags(str, '__', 'u');
