@@ -1,3 +1,4 @@
+// Engine.js
 //-----------------------------------------------------------------------
 const textElement          = document.querySelector('#text')
 const choiceButtonsElement = document.querySelector('#choice-buttons')
@@ -302,20 +303,22 @@ function handleTextInput(textNode) {
 //-----------------------------------------------------------------------
 function showChoiceButtons(textNode) {
     choiceButtonsElement.style.display = 'grid';
-
     textInputElement.style.display = 'none';
-
-    const singleChoice = textNode.choices.length === 1;
-
-    choiceButtonsElement.style.gridTemplateColumns = singleChoice ? "auto" : "repeat(2, auto)";
 
     clearChoiceButtons();
 
-    textNode.choices.forEach(choice => {
+    const availableChoices = textNode.choices.filter(choice => showChoice(choice));
+
+    currentChoices = availableChoices;
+
+    const singleChoice = availableChoices.length === 1;
+    choiceButtonsElement.style.gridTemplateColumns = singleChoice ? "auto" : "repeat(2, auto)";
+
+    availableChoices.forEach(choice => {
         createChoiceButton(choice);
     });
 
-    resetChoiceIndex();
+    resetChoiceIndex(); 
 }
 //-----------------------------------------------------------------------
 function clearChoiceButtons() {
