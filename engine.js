@@ -209,7 +209,7 @@ function applyFadeInAnimation(element) {
 }
 //-----------------------------------------------------------------------
 let showTextNode = (textNodeIndex) => { // Using let for easy overriding by user
-    if(textNodeIndex === "restart") return startGame();
+    if(textNodeIndex === "restart") return startGame(disk);
 
     let textNodeFunction = textNodes.get(textNodeIndex);
     let textNode = textNodeFunction ? textNodeFunction() : null;
@@ -352,7 +352,7 @@ function removeChoiceButtonListeners() {
 function selectChoice(choice) {
     const nextTextNodeId = choice.nextText;
 
-    if (nextTextNodeId === "start") return startGame();
+    if (nextTextNodeId === "start") return startGame(disk);
     
     state = Object.assign(state, choice.setState);
 
@@ -431,7 +431,7 @@ function replacePronouns(text) {
 function goBack() {
     //console.log("Initial navigation history (before goBack):", navigationHistory);
 
-    if (navigationHistory.length < 1) return startGame();
+    if (navigationHistory.length < 1) return startGame(disk);
 
     const currentTextNodeId = navigationHistory.pop();
 
