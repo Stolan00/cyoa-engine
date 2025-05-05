@@ -442,3 +442,14 @@ function goBack() {
     
     showTextNode(previousTextNodeId);
 }
+
+
+module.exports = {
+    formatText,
+    replacePronouns,
+    addStyleTags,
+    showTextNode,
+    selectChoice,
+    goBack,
+    showChoice
+}
