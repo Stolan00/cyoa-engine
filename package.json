@@ -1,0 +1,28 @@
+{
+    "scripts": {
+        "test": "jest --config jest.config.js",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage",
+        "test:integration": "jest --config jest.integration.config.js",
+        "start": "http-server src -p 8080",
+        "build": "mkdir -p dist && cp -r src/* dist/",
+        "predeploy": "npm run build",
+        "deploy": "gh-pages -d dist"
+    },
+    "name": "cyoa-engine",
+    "version": "1.0.0",
+    "description": "An engine for making 'Choose-Your-Own-Adventure' style text games. Currently incomplete.",
+    "main": "jest.config.js",
+    "directories": {
+        "test": "test"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "jest-environment-jsdom": "^29.7.0",
+        "jest-puppeteer": "^11.0.0",
+        "puppeteer": "^24.8.0"
+    }
+}
